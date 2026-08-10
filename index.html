@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>VIT Result Calculator (React)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- React CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f8;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 400px;
+    }
+
+    input {
+      padding: 8px;
+      margin: 5px;
+      width: 80px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+function App() {
+  const [subjects, setSubjects] = React.useState([
+    { mse: "", ese: "", total: 0 },
+    { mse: "", ese: "", total: 0 },
+    { mse: "", ese: "", total: 0 },
+    { mse: "", ese: "", total: 0 },
+  ]);
+
+  const handleChange = (index, field, value) => {
+    const updated = [...subjects];
+    updated[index][field] = value;
+
+    const mse = parseFloat(updated[index].mse) || 0;
+    const ese = parseFloat(updated[index].ese) || 0;
+
+    updated[index].total = (mse * 0.3 + ese * 0.7).toFixed(2);
+
+    setSubjects(updated);
+  };
+
+  const avg =
+    subjects.reduce((sum, s) => sum + parseFloat(s.total || 0), 0) / 4;
+
+  return (
+    <div>
+      <h1>VIT Semester Result Calculator</h1>
+
+      {subjects.map((sub, i) => (
+        <div className="card" key={i}>
+          <h3>Subject {i + 1}</h3>
+
+          <input
+            type="number"
+            placeholder="MSE"
+            onChange={(e) =>
+              handleChange(i, "mse", e.target.value)
+            }
+          />
+
+          <input
+            type="number"
+            placeholder="ESE"
+            onChange={(e) =>
+              handleChange(i, "ese", e.target.value)
+            }
+          />
+
+          <p>Total: {sub.total}</p>
+        </div>
+      ))}
+
+      <h2>Average: {avg.toFixed(2)}</h2>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+</script>
+
+</body>
+</html>

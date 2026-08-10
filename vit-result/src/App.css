@@ -1,0 +1,62 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+}
+
+.container {
+  text-align: center;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  margin: 10px auto;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+input {
+  display: block;
+  width: 80%;
+  margin: 8px auto;
+  padding: 8px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+/* 📱 Responsive */
+@media (max-width: 600px) {
+  .card {
+    width: 90%;
+  }
+}
+.header {
+  background: #0b5ed7;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.student-form {
+  background: white;
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 400px;
+  border-radius: 10px;
+}
+
+select {
+  display: block;
+  width: 85%;
+  margin: 8px auto;
+  padding: 8px;
+}
+
+.footer {
+  margin-top: 20px;
+  color: gray;
+}

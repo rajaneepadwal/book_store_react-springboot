@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VIT Result Calculator</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>VIT Result Calculator</h1>
+
+    <p class="subtitle">
+        MSE 30% + ESE 70%
+    </p>
+
+    <form id="resultForm">
+
+        <div class="input-group">
+            <label for="prn">PRN</label>
+
+            <input
+                    type="text"
+                    id="prn"
+                    maxlength="8"
+                    placeholder="Enter 8-digit PRN"
+                    required>
+        </div>
+
+        <div class="input-group">
+            <label for="studentName">Student Name</label>
+
+            <input
+                    type="text"
+                    id="studentName"
+                    placeholder="Enter your name"
+                    required>
+        </div>
+
+
+        <h2>Subject Marks</h2>
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>Subject</th>
+                <th>MSE / 30</th>
+                <th>ESE / 100</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr>
+                <td>Data Structures</td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="mse1"
+                            min="0"
+                            max="30"
+                            step="0.01"
+                            required>
+                </td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="ese1"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required>
+                </td>
+            </tr>
+
+            <tr>
+                <td>DBMS</td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="mse2"
+                            min="0"
+                            max="30"
+                            step="0.01"
+                            required>
+                </td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="ese2"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Computer Networks</td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="mse3"
+                            min="0"
+                            max="30"
+                            step="0.01"
+                            required>
+                </td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="ese3"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required>
+                </td>
+            </tr>
+
+            <tr>
+                <td>OOP</td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="mse4"
+                            min="0"
+                            max="30"
+                            step="0.01"
+                            required>
+                </td>
+
+                <td>
+                    <input
+                            type="number"
+                            id="ese4"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            required>
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        <button type="submit">
+            Calculate Result
+        </button>
+
+    </form>
+
+
+    <div id="errorMessage" class="error"></div>
+
+
+    <div id="resultSection" class="result-section">
+
+        <h2>Result</h2>
+
+        <p>
+            <strong>PRN:</strong>
+            <span id="resultPrn"></span>
+        </p>
+
+        <p>
+            <strong>Student:</strong>
+            <span id="resultName"></span>
+        </p>
+
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>Subject</th>
+                <th>MSE</th>
+                <th>ESE</th>
+                <th>Final</th>
+            </tr>
+            </thead>
+
+            <tbody id="resultTableBody">
+            </tbody>
+
+        </table>
+
+
+        <div class="percentage">
+
+            Final Percentage:
+            <span id="percentage"></span>%
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

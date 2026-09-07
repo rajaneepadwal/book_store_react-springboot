@@ -17,36 +17,25 @@ function Navbar({ setPage, cartCount }) {
                 Book Store by Rajanee using Springboot with React
             </h2>
 
-
             <div className="nav-links">
 
-                <button
-                    onClick={() => setPage("home")}
-                >
+                <button onClick={() => setPage("home")}>
                     Home
                 </button>
 
-                <button
-                    onClick={() => setPage("catalogue")}
-                >
+                <button onClick={() => setPage("catalogue")}>
                     Catalogue
                 </button>
 
-                <button
-                    onClick={() => setPage("login")}
-                >
+                <button onClick={() => setPage("login")}>
                     Login
                 </button>
 
-                <button
-                    onClick={() => setPage("register")}
-                >
+                <button onClick={() => setPage("register")}>
                     Register
                 </button>
 
-                <button
-                    onClick={() => setPage("cart")}
-                >
+                <button onClick={() => setPage("cart")}>
                     Cart ({cartCount})
                 </button>
 
@@ -187,7 +176,6 @@ function Login({ setPage, onLogin }) {
 
                 setMessage("Login successful!");
 
-                // Tell App that login was successful
                 onLogin(data);
 
             } else {
@@ -214,7 +202,6 @@ function Login({ setPage, onLogin }) {
         <div className="form-container">
 
             <h2>Login</h2>
-
 
             <form onSubmit={login}>
 
@@ -555,10 +542,15 @@ function Catalogue({ onBuyNow }) {
    CART PAGE
 ========================= */
 
-function Cart({ cart, setPage, removeFromCart }) {
+function Cart({
+    cart,
+    setPage,
+    removeFromCart
+}) {
 
     const total = cart.reduce(
-        (sum, book) => sum + book.price,
+        (sum, item) =>
+            sum + (item.price * item.quantity),
         0
     );
 
@@ -595,39 +587,44 @@ function Cart({ cart, setPage, removeFromCart }) {
 
                     <div className="book-grid">
 
-                        {cart.map((book, index) => (
+                        {cart.map(item => (
 
                             <div
                                 className="book-card"
-                                key={index}
+                                key={item.id}
                             >
 
                                 <img
-                                    src={book.imageUrl}
-                                    alt={book.title}
+                                    src={item.imageUrl}
+                                    alt={item.title}
                                 />
 
 
                                 <div className="book-details">
 
                                     <h2>
-                                        {book.title}
+                                        {item.title}
                                     </h2>
 
 
                                     <p>
-                                        Author: {book.author}
+                                        Author: {item.author}
+                                    </p>
+
+
+                                    <p>
+                                        Quantity: {item.quantity}
                                     </p>
 
 
                                     <h3>
-                                        ₹{book.price}
+                                        ₹{item.price * item.quantity}
                                     </h3>
 
 
                                     <button
                                         onClick={() =>
-                                            removeFromCart(index)
+                                            removeFromCart(item.id)
                                         }
                                     >
                                         Remove
@@ -674,12 +671,89 @@ function Cart({ cart, setPage, removeFromCart }) {
    CHECKOUT PAGE
 ========================= */
 
-function Checkout({ cart, setPage }) {
+function Checkout({
+    cart,
+    loggedInUser,
+    setPage,
+    clearCart
+}) {
+
+    const [message, setMessage] = useState("");
 
     const total = cart.reduce(
-        (sum, book) => sum + book.price,
+        (sum, item) =>
+            sum + (item.price * item.quantity),
         0
     );
+
+
+    function placeOrder() {
+
+        const orderData = {
+
+            userId: loggedInUser.id,
+
+            total: total,
+
+            items: cart.map(item => ({
+
+                bookId: item.bookId,
+
+                quantity: item.quantity,
+
+                price: item.price
+
+            }))
+
+        };
+
+
+        fetch("/api/orders", {
+
+            method: "POST",
+
+            headers: {
+
+                "Content-Type": "application/json"
+
+            },
+
+            body: JSON.stringify(orderData)
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Order failed");
+            }
+
+            return response.json();
+
+        })
+
+        .then(async data => {
+
+    await clearCart();
+
+    setMessage(
+        "Order placed successfully! Order ID: "
+        + data.id
+    );
+
+})
+
+        .catch(error => {
+
+            console.error(error);
+
+            setMessage(
+                "Failed to place order."
+            );
+
+        });
+
+    }
 
 
     return (
@@ -702,14 +776,25 @@ function Checkout({ cart, setPage }) {
             <br />
 
 
-            <button
-                className="main-button"
-                onClick={() =>
-                    alert("Order placed successfully!")
-                }
-            >
-                Place Order
-            </button>
+            {message && (
+
+                <p className="message">
+                    {message}
+                </p>
+
+            )}
+
+
+            {!message && (
+
+                <button
+                    className="main-button"
+                    onClick={placeOrder}
+                >
+                    Place Order
+                </button>
+
+            )}
 
 
             <br />
@@ -734,21 +819,55 @@ function Checkout({ cart, setPage }) {
 
 function App() {
 
-    const [page, setPage] = useState("home");
+    const [page, setPage] =
+        useState("home");
 
 
-    // Stores the currently logged-in user
     const [loggedInUser, setLoggedInUser] =
         useState(null);
 
 
-    // Stores books in cart
-    const [cart, setCart] = useState([]);
+    const [cart, setCart] =
+        useState([]);
 
 
-    // Stores the book clicked before login
     const [pendingBook, setPendingBook] =
         useState(null);
+
+
+    /* =========================
+       LOAD CART FROM DATABASE
+    ========================= */
+
+    function loadCart(userId) {
+
+        fetch(`/api/cart/${userId}`)
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Failed to load cart");
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                setCart(data);
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Error loading cart:",
+                    error
+                );
+
+            });
+    }
 
 
     /* =========================
@@ -761,23 +880,70 @@ function App() {
 
 
         /*
-         If user clicked Buy Now
-         before logging in,
-         add that book to cart.
+         If a book was selected
+         before login, save it
+         directly into database.
         */
 
         if (pendingBook) {
 
-            setCart(previousCart => [
-                ...previousCart,
-                pendingBook
-            ]);
+            fetch("/api/cart", {
 
-            setPendingBook(null);
+                method: "POST",
 
-            setPage("cart");
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    userId: user.id,
+
+                    bookId: pendingBook.id,
+
+                    quantity: 1
+
+                })
+
+            })
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Failed to add book"
+                    );
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                setPendingBook(null);
+
+                loadCart(user.id);
+
+                setPage("cart");
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Error adding book:",
+                    error
+                );
+
+            });
 
         } else {
+
+            loadCart(user.id);
 
             setPage("home");
 
@@ -793,31 +959,77 @@ function App() {
     function handleBuyNow(book) {
 
         /*
-         User is NOT logged in
-         */
+         User is not logged in.
+         Remember selected book.
+        */
 
         if (!loggedInUser) {
 
-            // Remember selected book
             setPendingBook(book);
 
-            // Send user to login
             setPage("login");
 
             return;
+
         }
 
 
         /*
-         User is already logged in
-         */
+         User is logged in.
+         Save book in database.
+        */
 
-        setCart(previousCart => [
-            ...previousCart,
-            book
-        ]);
+        fetch("/api/cart", {
 
-        setPage("cart");
+            method: "POST",
+
+            headers: {
+
+                "Content-Type":
+                    "application/json"
+
+            },
+
+            body: JSON.stringify({
+
+                userId: loggedInUser.id,
+
+                bookId: book.id,
+
+                quantity: 1
+
+            })
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to add book"
+                );
+            }
+
+            return response.json();
+
+        })
+
+        .then(data => {
+
+            loadCart(loggedInUser.id);
+
+            setPage("cart");
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Error adding book:",
+                error
+            );
+
+        });
 
     }
 
@@ -826,15 +1038,79 @@ function App() {
        REMOVE FROM CART
     ========================= */
 
-    function removeFromCart(index) {
+    function removeFromCart(cartItemId) {
 
-        setCart(previousCart =>
-            previousCart.filter(
-                (_, i) => i !== index
-            )
+        fetch(`/api/cart/${cartItemId}`, {
+
+            method: "DELETE"
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    "Failed to remove item"
+                );
+            }
+
+            return response;
+
+        })
+
+        .then(() => {
+
+            loadCart(loggedInUser.id);
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Error removing item:",
+                error
+            );
+
+        });
+
+    }
+
+
+    /* =========================
+       CLEAR CART
+    ========================= */
+async function clearCart() {
+
+    if (!loggedInUser) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/api/cart/user/${loggedInUser.id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to clear cart");
+        }
+
+        setCart([]);
+
+        console.log("Cart cleared successfully");
+
+    } catch (error) {
+
+        console.error(
+            "Error clearing cart:",
+            error
         );
 
     }
+}
 
 
     return (
@@ -899,7 +1175,9 @@ function App() {
 
                 <Checkout
                     cart={cart}
+                    loggedInUser={loggedInUser}
                     setPage={setPage}
+                    clearCart={clearCart}
                 />
 
             )}
